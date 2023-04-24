@@ -40,14 +40,20 @@ class DocumentFactory
         $content = trim(
             preg_replace('/\s+/i', ' ', mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'UTF-8, ISO-8859-1, ISO-8859-15', true)))
         );
-        $metadata = [
-            'section' => 'page 1',
+
+        $document_metadata = $parsed_markdown->getFrontMatter();
+
+        $section_metadata = [
+            'section' => @json_encode($document_metadata['menu'] ?? []) ?? 'page 1',
             'words' => str_word_count($content)
         ];
-        $metadata = array_merge($metadata);
 
-        $sections[] = new Section($content, $metadata);
+        $sections[] = new Section($content, $section_metadata);
 
-        return new Document($location, $sections, $parsed_markdown->getFrontMatter());
+        return new Document(
+            $location,
+            $sections,
+            $document_metadata
+        );
     }
 }

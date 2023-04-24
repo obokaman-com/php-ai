@@ -40,25 +40,25 @@ class Ai
         $vector_question = $this->embeddings->vectorQuestion($question);
 
         $answers = $this->embeddings->guessBestAnswers($this->excerpts, $this->vector_excerpts, $vector_question);
-        
+
         $prompt = <<<TEXT
-Given the following documents, when a user ask a question about it, create a final answer. 
+Given the following documents, when a user ask a question about it, create a final, elaborated, answer. 
 ALWAYS format your output using JSON, following this template: 
 
-```JSON 
 {
-    "answer": "[HERE YOU WRITE YOUR ANSWER]",
-    "sources": "[HERE YOU WRITE YOUR SOURCES, THE SECTIONS OR PAGES FROM THE DOCUMENT]"
+    "question": "[QUESTION]",
+    "answer": "[ANSWER]",
+    "sources": "[SOURCES, THE SECTIONS OR PAGES FROM THE DOCUMENT]"
 }
-```
 
-If you don't know the answer, or the topic is not covered in the document, ONLY answer with "[DONT KNOW]" in the "answer" field. Don't try to make up an answer.
-
+If you don't know the answer, or the topic is not covered in the document, ONLY answer with "[DONT KNOW]" in the "answer" field. Don't try to make up an answer
 TEXT;
 
         foreach ($answers as $answer) {
             $prompt .= <<<TEXT
-DOCUMENT ({$this->excerpts[$answer['index']]->location}, {$this->excerpts[$answers[0]['index']]->metadata['section']})
+
+
+Extracted from {$this->excerpts[$answer['index']]->location}, {$this->excerpts[$answers[0]['index']]->metadata['section']}
 =======
 {$this->excerpts[$answer['index']]->text}
 =======

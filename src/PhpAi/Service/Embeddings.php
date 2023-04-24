@@ -2,11 +2,9 @@
 
 namespace Obokaman\PhpAi\Service;
 
-use Obokaman\PhpAi\Model\AiAnswer;
+use Obokaman\PhpAi\Model\Document\Document;
 use Obokaman\PhpAi\Model\Document\Excerpt;
 use OpenAI;
-
-use Obokaman\PhpAi\Model\Document\Document;
 
 class Embeddings
 {
@@ -42,7 +40,7 @@ class Embeddings
      * @param int $chunk_overlap
      * @return Excerpt[]
      */
-    public function extractExcerpts(array $documents, int $chunk_size = 1500, int $chunk_overlap = 200): array
+    public function extractExcerpts(array $documents, int $chunk_size = 3000, int $chunk_overlap = 1000): array
     {
         $excerpts = [];
 
@@ -52,11 +50,22 @@ class Embeddings
                 $length = mb_strlen($text);
 
                 for ($i = 0; $i < $length; $i += ($chunk_size - $chunk_overlap)) {
+                    // If the remaining text is less than $chunk_size, increase the overlap to get a larger excerpt
+                    if ($length - $i < $chunk_size && $i > 0) {
+                        $new_overlap = $chunk_size - ($length - $i);
+                        $i -= $new_overlap - $chunk_overlap;
+                    }
+
                     $excerpts[] = new Excerpt(
                         $document->location,
                         mb_substr($text, $i, $chunk_size),
                         $section->metadata
                     );
+
+                    // Break the loop if the remaining text is less than $chunk_size
+                    if ($length - $i < $chunk_size) {
+                        break;
+                    }
                 }
             }
         }
@@ -87,15 +96,25 @@ class Embeddings
         return array_reverse(array_slice($results, -3));
     }
 
-    private function cosineSimilarity(array $embedding, array $embedding1)
+    private function euclidianDistance(array $embedding_a, array $embedding_b)
+    {
+        $distance = 0;
+        foreach ($embedding_a as $index => $embedding) {
+            $distance = pow($embedding - $embedding_b[$index], 2);
+        }
+
+        return sqrt($distance);
+    }
+
+    private function cosineSimilarity(array $embedding_a, array $embedding_b)
     {
         $dotProduct = 0;
         $uLength = 0;
         $vLength = 0;
-        for ($i = 0; $i < count($embedding); $i++) {
-            $dotProduct += $embedding[$i] * $embedding1[$i];
-            $uLength += $embedding[$i] * $embedding[$i];
-            $vLength += $embedding1[$i] * $embedding1[$i];
+        for ($i = 0; $i < count($embedding_a); $i++) {
+            $dotProduct += $embedding_a[$i] * $embedding_b[$i];
+            $uLength += $embedding_a[$i] * $embedding_a[$i];
+            $vLength += $embedding_b[$i] * $embedding_b[$i];
         }
         $uLength = sqrt($uLength);
         $vLength = sqrt($vLength);

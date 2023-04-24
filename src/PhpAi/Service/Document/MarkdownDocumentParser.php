@@ -2,10 +2,8 @@
 
 namespace Obokaman\PhpAi\Service\Document;
 
-use League\CommonMark\Extension\FrontMatter\Data\LibYamlFrontMatterParser;
 use League\CommonMark\Extension\FrontMatter\Exception\InvalidFrontMatterException;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
-use League\CommonMark\Extension\FrontMatter\FrontMatterParser;
 use Obokaman\PhpAi\Model\Document\Document;
 use Obokaman\PhpAi\Model\Document\DocumentFactory;
 
@@ -26,16 +24,14 @@ class MarkdownDocumentParser implements DocumentParser
         if (pathinfo($file_path, PATHINFO_EXTENSION) === 'md') {
             try {
                 $parsed_markdown = $this->parser->getFrontMatterParser()->parse(file_get_contents($file_path));
-            }
-            catch (InvalidFrontMatterException $e)
-            {
+            } catch (InvalidFrontMatterException $e) {
                 dump($file_path);
                 dump($e->getMessage());
 
                 return $this->next($file_path);
             }
 
-            return DocumentFactory::fromMarkdown(basename($file_path), $parsed_markdown);
+            return DocumentFactory::fromMarkdown($file_path, $parsed_markdown);
         }
 
         return $this->next($file_path);

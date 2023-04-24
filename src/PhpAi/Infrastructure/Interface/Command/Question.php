@@ -36,9 +36,9 @@ class Question extends Command
 
         $documents = $this->folder_parser->parse('./public/docs_to_ingest');
 
-        $console->writeln('This application allow you to ask questions about this documents:');
+        $console->info('Your question will be based in the given ' . count($documents) . ' documents available in /public/docs_to_ingest/ folder.');
         foreach ($documents as $document) {
-            $console->writeln(json_encode($document->metadata, JSON_THROW_ON_ERROR));
+            $console->writeln(json_encode($document->metadata, JSON_THROW_ON_ERROR), OutputInterface::VERBOSITY_VERBOSE);
         }
 
         $this->ai->memorize($documents);
@@ -47,8 +47,9 @@ class Question extends Command
 
         $answer = $this->ai->answer($question);
 
-        dump($answer->answer);
-        dump($answer->sources);
+        $console->section('Answer: ' . $answer->answer);
+        $console->section('Sources: ' . $answer->sources);
+        if ($console->isVerbose()) $console->section('Prompt used: ' . $answer->prompt);
 
         return Command::SUCCESS;
     }
