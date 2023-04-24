@@ -3,7 +3,7 @@
 namespace Obokaman\PhpAi\Infrastructure\Interface\Command;
 
 use Obokaman\PhpAi\Service\Ai;
-use Obokaman\PhpAi\Service\PDFParser;
+use Obokaman\PhpAi\Service\Document\FolderParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Ingest extends Command
 {
-    public function __construct(private Ai $ai, private PDFParser $pdf_parser)
+    public function __construct(private Ai $ai, private FolderParser $folder_parser)
     {
         parent::__construct();
     }
@@ -27,7 +27,7 @@ class Ingest extends Command
     {
         $console = new SymfonyStyle($input, $output);
 
-        $documents = $this->pdf_parser->parsePDFFolder('./public/docs_to_ingest');
+        $documents = $this->folder_parser->parse('./public/docs_to_ingest');
 
         $console->writeln('Memorizing ' . count($documents) . ' document/s...');
 

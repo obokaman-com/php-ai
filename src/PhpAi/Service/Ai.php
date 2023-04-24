@@ -40,7 +40,7 @@ class Ai
         $vector_question = $this->embeddings->vectorQuestion($question);
 
         $answers = $this->embeddings->guessBestAnswers($this->excerpts, $this->vector_excerpts, $vector_question);
-
+        
         $prompt = <<<TEXT
 Given the following documents, when a user ask a question about it, create a final answer. 
 ALWAYS format your output using JSON, following this template: 

@@ -3,18 +3,16 @@
 namespace Obokaman\PhpAi\Infrastructure\Interface\Command;
 
 use Obokaman\PhpAi\Service\Ai;
-use Obokaman\PhpAi\Service\Embeddings;
-use Obokaman\PhpAi\Service\PDFParser;
+use Obokaman\PhpAi\Service\Document\FolderParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Flex\Options;
 
 class Question extends Command
 {
-    public function __construct(private PDFParser $pdf_parser, private Ai $ai)
+    public function __construct(private FolderParser $folder_parser, private Ai $ai)
     {
         parent::__construct();
     }
@@ -36,7 +34,7 @@ class Question extends Command
     {
         $console = new SymfonyStyle($input, $output);
 
-        $documents = $this->pdf_parser->parsePDFFolder('./public/docs_to_ingest');
+        $documents = $this->folder_parser->parse('./public/docs_to_ingest');
 
         $console->writeln('This application allow you to ask questions about this documents:');
         foreach ($documents as $document) {

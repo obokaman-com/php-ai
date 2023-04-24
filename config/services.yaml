@@ -33,3 +33,10 @@ services:
 
     League\CommonMark\CommonMarkConverter:
         class: League\CommonMark\CommonMarkConverter
+
+    Obokaman\PhpAi\Service\Document\FolderParser:
+        arguments: ['@Obokaman\PhpAi\Service\Document\PDFDocumentParser']
+
+    Obokaman\PhpAi\Service\Document\PDFDocumentParser:
+        arguments: ['@Obokaman\PhpAi\Service\Document\MarkdownDocumentParser']
+

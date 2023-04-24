@@ -2,6 +2,7 @@
 
 namespace Obokaman\PhpAi\Model\Document;
 
+use League\CommonMark\Extension\FrontMatter\Input\MarkdownInputWithFrontMatter;
 use Smalot\PdfParser\Document as ParsedPDFDocument;
 
 class DocumentFactory
@@ -24,5 +25,29 @@ class DocumentFactory
         }
 
         return new Document($location, $sections, $document->getDetails());
+    }
+
+    /**
+     * @param string $location
+     * @param MarkdownInputWithFrontMatter $parsed_markdown
+     * @return Document
+     */
+    public static function fromMarkdown(string $location, MarkdownInputWithFrontMatter $parsed_markdown): Document
+    {
+        $sections = [];
+
+        $content = $parsed_markdown->getContent();
+        $content = trim(
+            preg_replace('/\s+/i', ' ', mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'UTF-8, ISO-8859-1, ISO-8859-15', true)))
+        );
+        $metadata = [
+            'section' => 'page 1',
+            'words' => str_word_count($content)
+        ];
+        $metadata = array_merge($metadata);
+
+        $sections[] = new Section($content, $metadata);
+
+        return new Document($location, $sections, $parsed_markdown->getFrontMatter());
     }
 }

@@ -42,7 +42,7 @@ class Embeddings
      * @param int $chunk_overlap
      * @return Excerpt[]
      */
-    public function extractExcerpts(array $documents, int $chunk_size = 1000, int $chunk_overlap = 200): array
+    public function extractExcerpts(array $documents, int $chunk_size = 1500, int $chunk_overlap = 200): array
     {
         $excerpts = [];
 
