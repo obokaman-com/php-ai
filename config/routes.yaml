@@ -1,0 +1,3 @@
+home:
+  path: /
+  controller: Obokaman\PhpAi\Infrastructure\Interface\Controller\Home::main
